@@ -30,16 +30,16 @@ parser = argparse.ArgumentParser(description='Deploy a Qt application on linux.'
 parser.add_argument('executable', help='Input executable')
 #parser.add_argument('-i','--input', help='Input executable', required=False)
 parser.add_argument('-qt','--qt-base-dir', help="Qt's base install path.", required=True)
-parser.add_argument('-qtqml','--qt-qml-dir', help="Path to Qt's QML imports directory. If not specified the 'QT_BASE_DIR/qml' is used.", required=False, default="")
-parser.add_argument('-qtbin','--qt-bin-dir', help="Path to Qt's 'bin' directory. If not specified the 'QT_BASE_DIR/bin' is used.", required=False, default="")
-parser.add_argument('-qtplugins','--qt-plugin-dir', help="Path to Qt's 'plugins' directory. If not specified the 'QT_BASE_DIR/plugins' is used.", required=False, default="")
+parser.add_argument('-qtqml','--qt-qml-dir', help="Path to Qt's QML imports directory. If not specified 'QT_BASE_DIR/qml' is used.", required=False, default="")
+parser.add_argument('-qtbin','--qt-bin-dir', help="Path to Qt's 'bin' directory. If not specified 'QT_BASE_DIR/bin' is used.", required=False, default="")
+parser.add_argument('-qtplugins','--qt-plugin-dir', help="Path to Qt's 'plugins' directory. If not specified 'QT_BASE_DIR/plugins' is used.", required=False, default="")
 parser.add_argument('--qml-import', help="Additional QML imports. Specify as '\"<module> <version>\"' e.g --qml-import \"QtMultimedia 5.0\". This is especially useful if you include QML code dynamically with e.g. Qt.createQmlObject(\"import QtMultimedia 5.0; SoundEffect{ ... }\")", action='append', required=False)
-parser.add_argument('-s','--qml-scan-dir', help='Directory to be scanned for QML file imports. This argument can be specified multiple times to include more directories.', action='append', required=True)
+parser.add_argument('-s','--qml-scan-dir', help='Directory to be recursively scanned for QML file imports. This argument can be specified multiple times to include more directories.', action='append', required=True)
 parser.add_argument('-o','--output', help="Output dependencies to JSON file. Use '-' for stdout", required=False)
-parser.add_argument('-v','--verbose', help='Verbose level <0-3> where 0 = No output. 1 = Info. 2 = Warnings. 3 = debug', type=int, default=0)
+parser.add_argument('-v','--verbose', help='Verbose level <0-3> where 0 = No output. 1 = Info. 2 = Info+Warnings. 3 = Info+Warnings+Debug', type=int, default=0)
 
-parser.add_argument('-ad','--appdir', help="Deploy to an AppImageKit 'AppDir'", nargs='?', default='', required=False)
-parser.add_argument('-ai','--appimage', help="Deploy to an AppImageKit 'AppImage'. This automatically sets '--appdir' to a temporary location if not specified.", nargs='?', default='', required=False)
+parser.add_argument('-ad','--appdir', help="Deploy to an AppImageKit 'AppDir'. If no argument is given a default location in /tmp will be used.", nargs='?', default='', required=False)
+parser.add_argument('-ai','--appimage', help="Deploy to an AppImageKit 'AppImage'. If no argument is given a default location in /tmp will be used. This also automatically sets '--appdir' to a temporary location if not specified.", nargs='?', default='', required=False)
 
 parsed_args = vars(parser.parse_args())
 

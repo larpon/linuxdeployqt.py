@@ -57,10 +57,12 @@ For `linuxdeployqt.py` to do it's magic the following commandline tools must be 
 * `strip`
 * `find`
 * `grep`
+
 These should be installed on most linux distros or at least easy to get via a package tool.
 
 **Resolving dependencies from QML imports**
 * qmlimportscanner
+
 The `qmlimportscanner` comes pre-installed with Qt versions installed from the Qt Online Installers. But on some distros it can be a bit tricky to find. As an example it can be found in the [`qtchooser` package](http://packages.ubuntu.com/xenial/all/qtchooser/filelist) in the Ubuntu/Debian repositories.
 
 **AppImage production**

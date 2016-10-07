@@ -3,7 +3,7 @@
 
 There are [other tools](https://github.com/probonopd/linuxdeployqt) in the making that looks very promising and way more agile - so until they mature this little script can hopefully be helpful meanwhile.
 
-This script implement some of the ideas from [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) which builds on logic from [macdeployqt](https://github.com/MaximAlien/macdeployqt)
+The script implement some of the ideas from [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) which builds on logic from [macdeployqt](https://github.com/MaximAlien/macdeployqt)
 
 **IMPORTANT NOTES**
 ATM the tool is only tested with:

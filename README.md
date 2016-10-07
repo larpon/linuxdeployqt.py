@@ -1,9 +1,12 @@
 # linuxdeployqt.py
 (Unofficial) [Qt5](//qt.io) application binary dependency resolver and deploy tool for linux - written in python.
 
-There are [other tools](https://github.com/probonopd/linuxdeployqt) in the making that looks very promising and way more agile - so until they mature this little script can hopefully be helpful in the meantime.
+There are [other tools](https://github.com/probonopd/linuxdeployqt) in the making that looks very promising and way more agile - so until they mature this little script can hopefully be helpful meanwhile.
 
 This script implement some of the ideas from [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) which builds on logic from [macdeployqt](https://github.com/MaximAlien/macdeployqt)
+
+**IMPORTANT NOTE**
+The tool is ATM only tested with Qt applications built with `Qt Creator` downloaded and installed via the Qt Online Installers. I hope it somehow can be used in different setups - but I need help.
 
 ## Description
 `linuxdeployqt.py` can resolve shared object `(*.so)` dependencies of dynamically linked applications.
@@ -18,6 +21,9 @@ While this approach probably won't work in some scenarios where `ldd` fails (cro
 
 For most cases `linuxdeployqt.py` should be able to find everything needed except for QML loaded dynamically at run time (with e.g.: `Qt.createQmlObject()`). If these run-time imports are unique (i.e. not imported in other files) these should be added as values to `--qml-import` parameters (see examples below).
 
+## Installation
+
+
 ## Dependencies
 
 For `linuxdeployqt.py` to do it's magic the following commandline tools must be available.
@@ -26,20 +32,20 @@ For `linuxdeployqt.py` to do it's magic the following commandline tools must be 
 * python
 
 **Common commandline tools**
-These should be installed on most linux distros or at least easy to get via a package tool.
 * `ldd`
 * `ln`
 * `strip`
 * `find`
 * `grep`
+These should be installed on most linux distros or at least easy to get via a package tool.
 
 **Resolving dependencies from QML imports**
-The `qmlimportscanner` comes pre-installed with Qt versions installed from the Qt Online Installers. But on some distros it can be a bit tricky to find. As an example it can be found in the [`qtchooser` package](http://packages.ubuntu.com/xenial/all/qtchooser/filelist) in the Ubuntu/Debian repositories.
 * qmlimportscanner
+The `qmlimportscanner` comes pre-installed with Qt versions installed from the Qt Online Installers. But on some distros it can be a bit tricky to find. As an example it can be found in the [`qtchooser` package](http://packages.ubuntu.com/xenial/all/qtchooser/filelist) in the Ubuntu/Debian repositories.
 
 **AppImage production**
 * [patchelf](http://blog.qt.io/blog/2011/10/28/rpath-and-runpath/)
-* AppImageAssistant
+* [AppImageAssistant](https://github.com/probonopd/AppImageKit/releases/tag/6)
 
 To install patchelf:
 ```
@@ -54,3 +60,5 @@ wget https://github.com/probonopd/AppImageKit/releases/download/6/AppImageAssist
 chmod +x AppImageAssistant
 sudo mv AppImageAssistant /usr/local/bin/
 ```
+
+## Usage

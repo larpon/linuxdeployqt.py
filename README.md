@@ -130,3 +130,5 @@ cd /tmp/
 ## Help
 For a list of available options use `./linuxdeployqt.py -h`
 TODO
+
+SEO tags: Qt Qt5 QML deploy linux python

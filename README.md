@@ -92,27 +92,28 @@ Before running the script there are some obligatory arguments (paths) you need t
 * The path to your project's QML files (`*.qml`)
 * The path to your application executable
 
-**Finding the path to your Qt *base* install**
-This is the base directory for ***the Qt version you used to build the application***
+**Finding the path to your Qt *base* install**. This is the base directory for ***the Qt version you used to build the application***
 If you installed Qt via the online installers and used Qt Creator from the same install to build the application then it should a look like this:
 `/home/user/Qt/<QT MAJOR.MINOR version>/gcc_64`
 An example:
 The application was build against `Qt 5.6.1` in Qt Creator then `/home/user/Qt/5.6/gcc_64` is your Qt *base path*
 
-**The path to your project's QML files**
-The top most directory of your project folder (usually where the top `*.pro` file resides)
+**The path to your project's QML files**. The top most directory of your project folder (usually where the top `*.pro` file resides)
 An example:
 `/home/user/Projects/TestApp`
 
-**The path to your application executable**
-When building with Qt Creator it creates a build directory above the project directory.
+**The path to your application executable**. When building with Qt Creator it creates a build directory above the project directory.
 An example:
-`/home/user/Projects/build-TestApp-Desktop_Qt_5_6_1_GCC_64bit2-Release`
-Some where within the build directoy you executable will reside.
+```
+/home/user/Projects/build-TestApp-Desktop_Qt_5_6_1_GCC_64bit2-Release
+```
+Somewhere within the build directoy you executable will reside.
 An example:
-`/home/user/Projects/build-TestApp-Desktop_Qt_5_6_1_GCC_64bit2-Release/TestApp`
+```
+/home/user/Projects/build-TestApp-Desktop_Qt_5_6_1_GCC_64bit2-Release/TestApp
+```
 
-Now using the paths from above we can create our `TestApp.AppImage`:
+Now using this scheme we can create our `TestApp.AppImage`:
 ```
 ./linuxdeployqt.py </path/to/executable> --qt-base-dir </path/to/Qt/install/base> --qml-scan-dir </path/to/project/> --appimage
 ```
@@ -120,7 +121,8 @@ Using the paths from the examples above gives us:
 ```
 ./linuxdeployqt.py /home/user/Projects/build-TestApp-Desktop_Qt_5_6_1_GCC_64bit2-Release/TestApp --qt-base-dir /home/user/Qt/5.6/gcc_64 --qml-scan-dir /home/user/Projects/TestApp --appimage
 ```
-**BONUS** All paths can be relative
+**BONUS TIP** All paths can be relative.
+
 If no other arguments are passed to `linuxdeployqt.py` it will per default build an AppDir and AppImage in `/tmp/<executable name>.AppDir` and `/tmp/<executable name>.AppImage`.
 
 Following the example values - you should be able to execute your application by running:

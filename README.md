@@ -107,7 +107,7 @@ An example:
 ```
 /home/user/Projects/build-TestApp-Desktop_Qt_5_6_1_GCC_64bit2-Release
 ```
-Somewhere within the build directoy you executable will reside.
+Somewhere within the build directoy your executable will reside.
 An example:
 ```
 /home/user/Projects/build-TestApp-Desktop_Qt_5_6_1_GCC_64bit2-Release/TestApp
@@ -132,7 +132,8 @@ cd /tmp/
 ```
 
 ## Help
-For a list of available options use `./linuxdeployqt.py -h`
 TODO
+
+For a list of available options use `./linuxdeployqt.py -h`
 
 SEO tags: Qt Qt5 QML deploy linux python

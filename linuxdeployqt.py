@@ -149,7 +149,54 @@ def which(program):
 def resolve_dependencies(executable):
     # NOTE Use 'ldd' method for now.
     # TODO Use non-ldd method for cross-compiled apps
-    return ldd(executable)
+    #return ldd(executable)
+    objdump(executable)
+    return {}
+
+def objdump(executable):
+    '''Get all library dependencies (recursive) of 'executable' using objdump'''
+    libs = {}
+    return lddr(executable,libs)
+
+def objdump(executable,libs):
+    '''Get all library dependencies (recursive) of 'executable' using objdump'''
+    output = subprocess.check_output(["objdump", "-x", executable])
+    output = output.split('\n')
+
+    accepted_columns = [ 'NEEDED','RPATH','RUNPATH' ]
+
+    for line in output:
+        split = line.split()
+        if len(split) == 0:
+            continue
+
+        if split[1] not in accepted_columns:
+            continue
+
+        if split[1] in blacklist or os.path.basename(split[0]) in blacklist:
+            debug("'%s' is blacklisted. Skipping..." % (split[0]))
+            continue
+
+        so = split[1]
+        path = split[2]
+        realpath = os.path.realpath(path)
+
+        if not os.path.exists(path):
+            debug("Can't find path for %s (resolved to %s). Skipping..." % (so,path))
+            continue
+
+        if so not in libs:
+            details = { 'so':so, 'path':path, 'realpath':realpath, 'dependants':set([executable]), 'type':'lib' }
+            libs[so] = details
+
+            debug("Resolved %s to %s" % (so, realpath))
+
+            libs = merge_dicts(libs, lddr(realpath,libs))
+        else:
+            libs[so]['dependants'].add(executable)
+
+    return libs
+
 
 def ldd(executable):
     '''Get all library dependencies (recursive) of 'executable' '''

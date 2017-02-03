@@ -9,6 +9,7 @@ The script implement some of the ideas from [linuxdeployqt](https://github.com/p
 ATM the tool is only tested with:
 * Python 2.x
 * Qt applications built with `Qt Creator` downloaded and installed via the *Qt Online Installers*
+* `Kubuntu 16.10`
 * `Kubuntu 16.04`
 * `Kubuntu 14.04`
 

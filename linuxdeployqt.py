@@ -149,16 +149,16 @@ def which(program):
 def resolve_dependencies(executable):
     # NOTE Use 'ldd' method for now.
     # TODO Use non-ldd method for cross-compiled apps
-    #return ldd(executable)
-    objdump(executable)
+    return ldd(executable)
+    #objdump(executable)
     return {}
 
 def objdump(executable):
     '''Get all library dependencies (recursive) of 'executable' using objdump'''
     libs = {}
-    return lddr(executable,libs)
+    return objdumpr(executable,libs)
 
-def objdump(executable,libs):
+def objdumpr(executable,libs):
     '''Get all library dependencies (recursive) of 'executable' using objdump'''
     output = subprocess.check_output(["objdump", "-x", executable])
     output = output.split('\n')

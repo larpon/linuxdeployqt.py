@@ -441,7 +441,7 @@ def create_desktop_file(path):
     text_file.close()
 
     # TODO
-    os.system('wget --quiet http://www.tinesoft.com/wp-content/uploads/qt-logo-48x48.png -O '+path+os.sep+'default.png')
+    os.system('wget -t 1 -T 5 --quiet https://www.shareicon.net/data/48x48/2015/09/17/102444_qt_512x512.png -O '+path+os.sep+'default.png')
 
 
 def build_appdir(dest_dir,executable,dependencies,qml_dirs,qt_plugins):

@@ -9,6 +9,8 @@ The script implement some of the ideas from [linuxdeployqt](https://github.com/p
 ATM the tool is only tested with:
 * Python 2.x
 * Qt applications built with `Qt Creator` downloaded and installed via the *Qt Online Installers*
+* `Kubuntu 17.10`
+* `Kubuntu 17.04`
 * `Kubuntu 16.10`
 * `Kubuntu 16.04`
 * `Kubuntu 14.04`
@@ -68,20 +70,20 @@ The `qmlimportscanner` comes pre-installed with Qt versions installed from the Q
 
 **AppImage production**
 * [patchelf](http://blog.qt.io/blog/2011/10/28/rpath-and-runpath/)
-* [AppImageAssistant](https://github.com/probonopd/AppImageKit/releases/tag/6)
+* [appimagetool](https://github.com/probonopd/AppImageKit/)
 
-To install patchelf:
+To install `patchelf`:
 ```
 wget https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.bz2
 tar xf patchelf-0.9.tar.bz2
 cd patchelf-0.9/ && ./configure  && make && sudo make install
 ```
 
-To install AppImageAssistant:
+To install `appimagetool`:
 ```
-wget https://github.com/probonopd/AppImageKit/releases/download/6/AppImageAssistant_6-x86_64.AppImage -O AppImageAssistant
-chmod +x AppImageAssistant
-sudo mv AppImageAssistant /usr/local/bin/
+wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+chmod +x appimagetool
+sudo mv appimagetool /usr/local/bin/
 ```
 
 ## Usage

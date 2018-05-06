@@ -2,7 +2,7 @@
 
 '''
 The MIT License (MIT)
-Copyright (c) 2016 Lars Pontoppidan
+Copyright (c) 2016-2018 Lars Pontoppidan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -25,6 +25,8 @@ import tempfile
 
 import shutil, errno
 
+script_path = os.path.dirname(os.path.realpath(__file__)).rstrip(os.sep)
+
 parser = argparse.ArgumentParser(description='Deploy a Qt application on linux.')
 
 parser.add_argument('executable', help='Input executable')
@@ -46,22 +48,12 @@ parsed_args = vars(parser.parse_args())
 # Arguments minus script name
 args = sys.argv[1:]
 
-blacklist = [
-    'linux-vdso.so.1',
-    'ld-linux-x86-64.so.2'
-]
-
-update_blacklist_cmd = 'wget --quiet https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist -O - | sort | uniq | grep -v "^#.*" | grep "[^-\s]"'
-blacklist += os.popen(update_blacklist_cmd).read().split('\n')
-#print(blacklist)
-#exit(0)
-
 # Try to see if first argument is an executable file
 #exe = os.path.abspath(args[0])
 #if which(exe) is None:
-exe = os.path.abspath(parsed_args['executable']) #os.path.abspath(args[0])
+exe = os.path.realpath(parsed_args['executable']) #os.path.abspath(args[0])
 
-qt_install_dir = os.path.abspath(parsed_args['qt_base_dir']) #os.path.abspath(args[1])
+qt_install_dir = os.path.realpath(parsed_args['qt_base_dir']) #os.path.abspath(args[1])
 
 qml_scan_dirs = parsed_args['qml_scan_dir'] #os.path.abspath(args[2])
 for index, elem in enumerate(qml_scan_dirs):
@@ -122,6 +114,19 @@ def debug(s):
         print("DEBUG: "+s)
 
 
+blacklist = [
+    'linux-vdso.so.1',
+    'ld-linux-x86-64.so.2'
+]
+
+blacklist_url = 'https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist'
+info('Updating blacklist from '+blacklist_url)
+update_blacklist_cmd = 'wget --quiet '+blacklist_url+' -O - | sort | uniq | grep -v "^#.*" | grep "[^-\s]"'
+blacklist += os.popen(update_blacklist_cmd).read().split('\n')
+#print(blacklist)
+#exit(0)
+
+
 def merge_dicts(x, y):
     '''Given two dicts, merge them into a new dict as a shallow copy.'''
     z = x.copy()
@@ -148,7 +153,7 @@ def which(program):
 
 def resolve_dependencies(executable):
     # NOTE Use 'ldd' method for now.
-    # TODO Use non-ldd method for cross-compiled apps
+    # TODO Use non-ldd method (objdump) for cross-compiled apps
     return ldd(executable)
     #objdump(executable)
     return {}
@@ -230,7 +235,7 @@ def lddr(executable,libs):
         realpath = os.path.realpath(path)
 
         if not os.path.exists(path):
-            debug("Can't find path for %s (resolved to %s). Skipping..." % (so,path))
+            debug("Can't find path for %s (resolved to %s). (%s => %s) Skipping..." % (so,path,executable,line))
             continue
 
         if so not in libs:
@@ -248,6 +253,15 @@ def lddr(executable,libs):
 def qml_imports(path, lib_path):
     '''Find QML dependencies from QML files in 'path' and pair them with libraries in 'lib_path' '''
 
+    # So ... qmlimportscanner has - or has had - a bad reputation.
+    # It's recursive auto discovery from -rootPath has given wrong results in various Qt versions
+    # If you trust the output of qmlimportscanner use this instead of the code below:
+    #qmlscanner_args = [qt_bin_dir+os.sep+"qmlimportscanner"]
+    #qmlscanner_args.append("-rootPath")
+    #qmlscanner_args.append(path)
+
+    # Alternative QML discovery (start)
+
     # bash command:
     # qmlfiles=$(find . | grep "\.qml$"); qmlimportscanner -qmlFiles $qmlfiles -importPath $QT_INSTALL_DIR/qml/)
 
@@ -264,6 +278,7 @@ def qml_imports(path, lib_path):
         if qml_file == '':
             continue
         qmlscanner_args.append(qml_file)
+    # Alternative QML discovery (end)
 
     qmlscanner_args.append("-importPath")
     qmlscanner_args.append(lib_path)
@@ -301,6 +316,10 @@ def qml_imports(path, lib_path):
         plugin = qml_import['plugin']
         full_path = path+os.sep+'lib'+plugin+'.so'
         realpath = os.path.realpath(full_path)
+        relativePath = ""
+
+        if 'relativePath' in qml_import:
+            relativePath = qml_import['relativePath'].rstrip(os.sep)
 
         if not os.path.exists(realpath):
             warn("Can't find shared object file (%s) for %s (%s)" % (full_path, qml_import['name']+' '+qml_import['version'], plugin))
@@ -309,7 +328,7 @@ def qml_imports(path, lib_path):
         debug("Resolved QML import '%s %s' to '%s'" % (qml_import['name'], qml_import['version'], realpath))
 
         so = os.path.basename(realpath)
-        details = { 'so':so, 'path':full_path, 'realpath':realpath, 'dependants':set([ exe ]), 'type':'qml plugin' }
+        details = { 'so':so, 'path':full_path, 'realpath':realpath, 'relativePath': relativePath, 'dependants':set([ exe ]), 'type':'qml plugin' }
         plugins[so] = details
 
     return plugins,imports
@@ -395,11 +414,13 @@ def determine_qt_plugins(deps):
 
 
 def strip(f):
-    res = subprocess.call(('strip', "-x", f))
-    debug("Stripping '%s'" % f)
-    if res > 0:
-        warn("'strip' command failed with return code '%s' on file '%s'" % (res,f))
-    return res
+    if os.path.isfile(f):
+        res = subprocess.call(('strip', "-x", f))
+        debug("Stripping '%s'" % f)
+        if res > 0:
+            warn("'strip' command failed with return code '%s' on file '%s'" % (res,f))
+        return res
+    return 0
 
 def patch_elf(options,f):
     arguments = ['patchelf'] + options + [ f ]
@@ -440,8 +461,8 @@ def create_desktop_file(path):
     text_file.write(d)
     text_file.close()
 
-    # TODO
-    os.system('wget -t 1 -T 5 --quiet https://www.shareicon.net/data/48x48/2015/09/17/102444_qt_512x512.png -O '+path+os.sep+'default.png')
+    # Copy default appimage icon from script home
+    shutil.copyfile(script_path+os.sep+'icon.png', path+os.sep+'default.png')
 
 
 def build_appdir(dest_dir,executable,dependencies,qml_dirs,qt_plugins):
@@ -486,7 +507,8 @@ def build_appdir(dest_dir,executable,dependencies,qml_dirs,qt_plugins):
 
         elif details['type'] == 'qml plugin':
             src = details['realpath']
-            dst = dest_dir+os.sep+appdir_qml+os.sep+src.replace(qt_qml_dir+os.sep,'',1)
+            # relativePath = details['relativePath']
+            dst = dest_dir+os.sep+appdir_qml+os.sep+src.replace(qt_qml_dir+os.sep,'',1) #+relativePath+os.sep+details['so']
             if not os.path.exists(os.path.dirname(dst)):
                 os.makedirs(os.path.dirname(dst))
             dst_dir = os.path.dirname(dst)

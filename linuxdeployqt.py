@@ -462,8 +462,12 @@ def create_desktop_file(path):
     text_file.close()
 
     # Copy default appimage icon from script home
-    shutil.copyfile(script_path+os.sep+'icon.png', path+os.sep+'default.png')
-
+    icon_file = script_path+os.sep+'icon.png'
+    if os.path.isfile(icon_file):
+        shutil.copyfile(icon_file, path+os.sep+'default.png')
+    else:
+        debug("Fetching remote icon")
+        os.system('wget -t 1 -T 5 --quiet https://raw.githubusercontent.com/Larpon/linuxdeployqt.py/master/icon.png -O '+path+os.sep+'default.png')
 
 def build_appdir(dest_dir,executable,dependencies,qml_dirs,qt_plugins):
 
@@ -556,7 +560,7 @@ def build_appdir(dest_dir,executable,dependencies,qml_dirs,qt_plugins):
 
 def build_appimage(appdir,appimage):
     debug("Building AppImage %s from %s" % (appimage,appdir))
-    res = subprocess.call(('AppImageAssistant', appdir, appimage))
+    res = subprocess.call(('appimagetool', appdir, appimage))
     return res
 
 def build_fake_qml(qml_import):

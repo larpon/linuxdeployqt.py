@@ -219,7 +219,7 @@ def lddr(executable,libs):
             continue
 
         if split[0] in blacklist or os.path.basename(split[0]) in blacklist:
-            #debug("'%s' is blacklisted. Skipping..." % (split[0]))
+            debug("'%s' is blacklisted. Skipping..." % (split[0]))
             continue
 
         if split[0] == 'statically' and split[1] == 'linked':

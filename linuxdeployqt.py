@@ -42,6 +42,7 @@ parser.add_argument('-v','--verbose', help='Verbose level <0-3> where 0 = No out
 
 parser.add_argument('-ad','--appdir', help="Deploy to an AppImageKit 'AppDir'. If no argument is given a default location in /tmp will be used.", nargs='?', default='', required=False)
 parser.add_argument('-ai','--appimage', help="Deploy to an AppImageKit 'AppImage'. If no argument is given a default location in /tmp will be used. This also automatically sets '--appdir' to a temporary location if not specified.", nargs='?', default='', required=False)
+parser.add_argument('-ib','--ignore-blacklist', help="Turn off the blacklist. No libraries will be filtered.", required=False, action='store_true')
 
 parsed_args = vars(parser.parse_args())
 
@@ -119,10 +120,13 @@ blacklist = [
     'ld-linux-x86-64.so.2'
 ]
 
-blacklist_url = 'https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist'
-info('Updating blacklist from '+blacklist_url)
-update_blacklist_cmd = 'wget --quiet '+blacklist_url+' -O - | sort | uniq | grep -v "^#.*" | grep "[^-\s]"'
-blacklist += os.popen(update_blacklist_cmd).read().split('\n')
+if not parsed_args["ignore_blacklist"]:
+    blacklist_url = 'https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist'
+    info('Updating blacklist from '+blacklist_url)
+    update_blacklist_cmd = 'wget --quiet '+blacklist_url+' -O - | sort | uniq | grep -v "^#.*" | grep "[^-\s]"'
+    blacklist += os.popen(update_blacklist_cmd).read().split('\n')
+else:
+    blacklist = []
 #print(blacklist)
 #exit(0)
 

@@ -165,7 +165,12 @@ def objdump(executable):
 
 def objdumpr(executable,libs):
     '''Get all library dependencies (recursive) of 'executable' using objdump'''
-    output = subprocess.check_output(["objdump", "-x", executable])
+    try:
+        output = subprocess.check_output(["objdump", "-x", executable])
+    except subprocess.CalledProcessError as e:
+        warn("CalledProcessError while running %s. Return code %s - output: %s" % (e.cmd,e.returncode,e.output))
+        output = e.output
+
     output = output.split('\n')
 
     accepted_columns = [ 'NEEDED','RPATH','RUNPATH' ]
@@ -210,7 +215,12 @@ def ldd(executable):
 
 def lddr(executable,libs):
     '''Get all library dependencies (recursive) of 'executable' '''
-    output = subprocess.check_output(["ldd", "-r", executable])
+    try:
+        output = subprocess.check_output(["ldd", "-r", executable])
+    except subprocess.CalledProcessError as e:
+        warn("CalledProcessError while running %s. Return code %s - output: %s" % (e.cmd,e.returncode,e.output))
+        output = e.output
+
     output = output.split('\n')
 
     for line in output:

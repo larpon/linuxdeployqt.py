@@ -281,7 +281,13 @@ def qml_imports(path, lib_path):
 
     # Find all qml files in 'path'
     find = subprocess.Popen(('find', path), stdout=subprocess.PIPE)
-    qml_files = subprocess.check_output(('grep', "\.qml$"), stdin=find.stdout)
+    qml_files = ""
+    try:
+        qml_files = subprocess.check_output(('grep', "\.qml$"), stdin=find.stdout)
+    except subprocess.CalledProcessError as e:
+        warn("No QML files found OR grep might have failed")
+        qml_files = "" #raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+
     find.wait()
 
     # Use Qt installed 'qmlimportscanner' to get list of dependant libraries
